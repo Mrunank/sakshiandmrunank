@@ -117,7 +117,7 @@ export default function WeddingWebsite() {
 
         {/* Welcome Text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <p className="text-[#f3d9c1] uppercase tracking-[0.5em] text-xs sm:text-sm mb-4">
+          <p className="text-[#800020] uppercase tracking-[0.5em] text-xs sm:text-sm mb-4">
             Welcome To
           </p>
 
@@ -125,7 +125,7 @@ export default function WeddingWebsite() {
             Sakshi & Mrunank
           </h1>
 
-          <p className="text-[#f3d9c1] text-sm sm:text-lg tracking-[0.3em] uppercase">
+          <p className="text-[#800020] text-sm sm:text-lg tracking-[0.3em] uppercase">
             Scroll To Open The Gates
           </p>
 
