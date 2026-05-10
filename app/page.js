@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-const engagementDate = new Date('2026-07-04T19:00:00');
+const engagementDate = new Date('2026-07-04T11:00:00');
 
 function CountdownCard({ label, value }) {
   return (
@@ -42,17 +42,25 @@ export default function WeddingWebsite() {
   });
 
   useEffect(() => {
-    const openDoors = () => {
-      setDoorsOpen(true);
-      window.removeEventListener('scroll', openDoors);
-    };
+  // lock scroll until doors open
+  document.body.style.overflow = 'hidden';
 
-    window.addEventListener('scroll', openDoors);
+  const openDoors = () => {
+    setDoorsOpen(true);
 
-    return () => {
-      window.removeEventListener('scroll', openDoors);
-    };
-  }, []);
+    // unlock scroll after animation starts
+    document.body.style.overflow = 'auto';
+
+    window.removeEventListener('scroll', openDoors);
+  };
+
+  window.addEventListener('scroll', openDoors);
+
+  return () => {
+    window.removeEventListener('scroll', openDoors);
+    document.body.style.overflow = 'auto';
+  };
+}, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -86,34 +94,30 @@ export default function WeddingWebsite() {
 
         {/* LEFT IMAGE DOOR */}
         <div
-          className={`absolute left-0 top-0 h-full w-1/2 overflow-hidden transition-transform duration-[2500ms] ease-[cubic-bezier(0.77,0,0.175,1)] ${doorsOpen ? '-translate-x-full' : 'translate-x-0'}`}
+          cclassName={`absolute left-0 top-0 h-full w-[50.5%] lg:w-1/2 overflow-hidden transition-transform duration-[3200ms] ease-[cubic-bezier(0.77,0,0.175,1)] transform-gpu will-change-transform ${doorsOpen ? '-translate-x-full' : 'translate-x-0'}`}
         >
           <img
             src="/door-left.jpg"
             alt="Left Door"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-center scale-[1.02]"
           />
-
-          {/* Glow Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
         </div>
 
         {/* RIGHT IMAGE DOOR */}
         <div
-          className={`absolute right-0 top-0 h-full w-1/2 overflow-hidden transition-transform duration-[2500ms] ease-[cubic-bezier(0.77,0,0.175,1)] ${doorsOpen ? 'translate-x-full' : 'translate-x-0'}`}
+          className={`absolute right-0 top-0 h-full w-[50.5%] lg:w-1/2 overflow-hidden transition-transform duration-[3200ms] ease-[cubic-bezier(0.77,0,0.175,1)] transform-gpu will-change-transform ${doorsOpen ? 'translate-x-full' : 'translate-x-0'}`}
         >
           <img
             src="/door-right.jpg"
             alt="Right Door"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-center scale-[1.02]"
           />
-
-          {/* Glow Overlay */}
           <div className="absolute inset-0 bg-gradient-to-l from-black/40 to-transparent"></div>
         </div>
 
         {/* Center Glow */}
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[8px] bg-gradient-to-b from-[#f5d7b8] via-white to-[#f5d7b8] shadow-[0_0_40px_rgba(255,255,255,0.8)]"></div>
+        <div className={`absolute left-1/2 top-0 -translate-x-1/2 h-full w-[8px] bg-gradient-to-b from-[#f5d7b8] via-white to-[#f5d7b8] shadow-[0_0_40px_rgba(255,255,255,0.8)] transition-opacity duration-1000 ${doorsOpen ? 'opacity-0' : 'opacity-100'}`}></div>
 
         {/* Welcome Text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
