@@ -33,12 +33,26 @@ function Section({ icon, title, children }) {
 }
 
 export default function WeddingWebsite() {
+  const [doorsOpen, setDoorsOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
   });
+
+  useEffect(() => {
+    const openDoors = () => {
+      setDoorsOpen(true);
+      window.removeEventListener('scroll', openDoors);
+    };
+
+    window.addEventListener('scroll', openDoors);
+
+    return () => {
+      window.removeEventListener('scroll', openDoors);
+    };
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -63,6 +77,64 @@ export default function WeddingWebsite() {
 
   return (
     <div className="bg-[#f8f2eb] text-[#4a1d2b] overflow-hidden">
+      {/* Cinematic Image Door Intro */}
+      <div
+        className={`fixed inset-0 z-[999] pointer-events-none transition-opacity duration-1000 ${doorsOpen ? 'opacity-0' : 'opacity-100'}`}
+      >
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black"></div>
+
+        {/* LEFT IMAGE DOOR */}
+        <div
+          className={`absolute left-0 top-0 h-full w-1/2 overflow-hidden transition-transform duration-[2500ms] ease-[cubic-bezier(0.77,0,0.175,1)] ${doorsOpen ? '-translate-x-full' : 'translate-x-0'}`}
+        >
+          <img
+            src="/door-left.jpg"
+            alt="Left Door"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+
+          {/* Glow Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
+        </div>
+
+        {/* RIGHT IMAGE DOOR */}
+        <div
+          className={`absolute right-0 top-0 h-full w-1/2 overflow-hidden transition-transform duration-[2500ms] ease-[cubic-bezier(0.77,0,0.175,1)] ${doorsOpen ? 'translate-x-full' : 'translate-x-0'}`}
+        >
+          <img
+            src="/door-right.jpg"
+            alt="Right Door"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+
+          {/* Glow Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-l from-black/40 to-transparent"></div>
+        </div>
+
+        {/* Center Glow */}
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[8px] bg-gradient-to-b from-[#f5d7b8] via-white to-[#f5d7b8] shadow-[0_0_40px_rgba(255,255,255,0.8)]"></div>
+
+        {/* Welcome Text */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+          <p className="text-[#f3d9c1] uppercase tracking-[0.5em] text-xs sm:text-sm mb-4">
+            Welcome To
+          </p>
+
+          <h1 className="text-white text-5xl sm:text-7xl md:text-8xl font-light tracking-tight mb-6">
+            Sakshi & Mrunank
+          </h1>
+
+          <p className="text-[#f3d9c1] text-sm sm:text-lg tracking-[0.3em] uppercase">
+            Scroll To Open The Gates
+          </p>
+
+          <div className="mt-8 animate-bounce text-white text-3xl">
+            ↓
+          </div>
+        </div>
+      </div>
+
       {/* Background Effects */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute top-[-120px] left-[-120px] w-[400px] h-[400px] rounded-full bg-pink-200 opacity-20 blur-3xl"></div>
@@ -121,7 +193,7 @@ export default function WeddingWebsite() {
 
               <div className="relative rounded-[32px] sm:rounded-[40px] overflow-hidden border border-[#e4cab7] bg-white/50 backdrop-blur-xl shadow-2xl max-w-[320px] sm:max-w-[420px] lg:max-w-[520px]">
                 <img
-                  src="/logo.png"
+                  src="logo.png"
                   alt="Wedding Logo"
                   className="w-full h-full object-cover"
                 />
