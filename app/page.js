@@ -6,8 +6,8 @@ const engagementDate = new Date('2026-07-04T19:00:00');
 
 function CountdownCard({ label, value }) {
   return (
-    <div className="bg-white/50 backdrop-blur-xl border border-[#e5cbb6] rounded-3xl px-6 py-8 shadow-xl min-w-[120px]">
-      <div className="text-5xl md:text-6xl font-light text-[#5b2333] mb-2 tracking-tight">
+    <div className="bg-white/60 backdrop-blur-xl border border-[#e5cbb6] rounded-3xl px-4 sm:px-6 py-6 sm:py-8 shadow-xl min-w-[140px]">
+      <div className="text-4xl sm:text-5xl md:text-6xl font-light text-[#5b2333] mb-2 tracking-tight">
         {String(value).padStart(2, '0')}
       </div>
       <div className="uppercase tracking-[0.35em] text-xs text-[#9c6e5f]">
@@ -70,16 +70,16 @@ export default function WeddingWebsite() {
       </div>
 
       {/* HERO */}
-      <section className="min-h-screen flex items-center justify-center px-6 relative">
-        <div className="max-w-7xl w-full grid lg:grid-cols-2 gap-16 items-center py-16">
+      <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 relative overflow-hidden">
+        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center py-10 sm:py-16">
           {/* Left Content */}
-          <div className="text-center lg:text-left order-2 lg:order-1">
+          <div className="text-center lg:text-left order-2 lg:order-1 px-1">
             <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/60 border border-[#e7d3c1] text-[#9c6e5f] tracking-[0.3em] uppercase text-xs mb-8 shadow-md">
               <span>✨</span>
               Our Forever Begins
             </div>
 
-            <h1 className="text-6xl md:text-8xl font-light leading-none mb-6 tracking-tight text-[#5b2333]">
+            <h1 className="text-5xl sm:text-6xl md:text-8xl font-light leading-tight sm:leading-none mb-6 tracking-tight text-[#5b2333]">
               Sakshi
               <span className="block text-[#9c6e5f] text-4xl md:text-5xl my-3 font-serif">
                 &
@@ -87,12 +87,12 @@ export default function WeddingWebsite() {
               Mrunank
             </h1>
 
-            <p className="text-xl md:text-2xl leading-relaxed text-[#6e4653] max-w-2xl mx-auto lg:mx-0 mb-10">
+            <p className="text-base sm:text-xl md:text-2xl leading-8 sm:leading-relaxed text-[#6e4653] max-w-2xl mx-auto lg:mx-0 mb-8 sm:mb-10 px-2 sm:px-0">
               Join us as we celebrate the beginning of a beautiful journey filled with love, laughter, traditions, and forever.
             </p>
 
-            <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-xl border border-[#e7d3c1] px-5 py-4 rounded-2xl shadow-lg">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-[#e7d3c1] px-4 sm:px-5 py-4 rounded-2xl shadow-lg w-full sm:w-auto">
                 <span className="text-xl">📅</span>
                 <div>
                   <div className="text-sm uppercase tracking-widest text-[#9c6e5f]">
@@ -102,7 +102,7 @@ export default function WeddingWebsite() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-xl border border-[#e7d3c1] px-5 py-4 rounded-2xl shadow-lg">
+              <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-[#e7d3c1] px-4 sm:px-5 py-4 rounded-2xl shadow-lg w-full sm:w-auto">
                 <span className="text-xl">📍</span>
                 <div>
                   <div className="text-sm uppercase tracking-widest text-[#9c6e5f]">
@@ -119,7 +119,7 @@ export default function WeddingWebsite() {
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-br from-pink-200 to-yellow-100 blur-3xl opacity-40 scale-110 rounded-full"></div>
 
-              <div className="relative rounded-[40px] overflow-hidden border border-[#e4cab7] bg-white/50 backdrop-blur-xl shadow-2xl max-w-[520px]">
+              <div className="relative rounded-[32px] sm:rounded-[40px] overflow-hidden border border-[#e4cab7] bg-white/50 backdrop-blur-xl shadow-2xl max-w-[320px] sm:max-w-[420px] lg:max-w-[520px]">
                 <img
                   src="/logo.png"
                   alt="Wedding Logo"
@@ -136,7 +136,7 @@ export default function WeddingWebsite() {
         icon={<span className="text-3xl">💖</span>}
         title="Countdown"
       >
-        <div className="flex flex-wrap justify-center gap-5 text-center">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-4 sm:gap-5 text-center">
           <CountdownCard label="Days" value={timeLeft.days} />
           <CountdownCard label="Hours" value={timeLeft.hours} />
           <CountdownCard label="Minutes" value={timeLeft.minutes} />
@@ -165,7 +165,7 @@ export default function WeddingWebsite() {
         icon={<span className="text-3xl">🗓️</span>}
         title="Event Details"
       >
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 max-w-6xl mx-auto">
           {[
             {
               title: 'Engagement Ceremony',
@@ -185,7 +185,7 @@ export default function WeddingWebsite() {
           ].map((item) => (
             <div
               key={item.title}
-              className="bg-white/55 backdrop-blur-xl border border-[#e7d3c1] rounded-3xl p-8 shadow-xl hover:-translate-y-1 transition-all"
+              className="bg-white/65 backdrop-blur-xl border border-[#e7d3c1] rounded-3xl p-6 sm:p-8 shadow-xl hover:-translate-y-1 transition-all"
             >
               <h3 className="text-2xl mb-3 text-[#5b2333]">{item.title}</h3>
               <p className="uppercase tracking-[0.25em] text-xs text-[#9c6e5f] mb-5">
@@ -202,11 +202,11 @@ export default function WeddingWebsite() {
         icon={<span className="text-3xl">📸</span>}
         title="Gallery"
       >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 max-w-6xl mx-auto">
           {[1, 2, 3, 4].map((item) => (
             <div
               key={item}
-              className="aspect-square rounded-3xl bg-white/50 border border-[#e7d3c1] shadow-xl flex items-center justify-center text-[#9c6e5f] text-lg"
+              className="aspect-square rounded-2xl sm:rounded-3xl bg-white/60 border border-[#e7d3c1] shadow-xl flex items-center justify-center text-[#9c6e5f] text-sm sm:text-lg"
             >
               Photo {item}
             </div>
@@ -219,18 +219,18 @@ export default function WeddingWebsite() {
         icon={<span className="text-3xl">🎶</span>}
         title="RSVP"
       >
-        <div className="max-w-2xl mx-auto bg-white/55 backdrop-blur-xl border border-[#e7d3c1] rounded-[40px] p-10 shadow-2xl">
+        <div className="max-w-2xl mx-auto bg-white/65 backdrop-blur-xl border border-[#e7d3c1] rounded-[28px] sm:rounded-[40px] p-5 sm:p-10 shadow-2xl">
           <form className="space-y-6">
             <input
               type="text"
               placeholder="Your Name"
-              className="w-full px-6 py-4 rounded-2xl border border-[#e4cab7] bg-white/70 outline-none"
+              className="w-full px-5 py-4 rounded-2xl border border-[#e4cab7] bg-white/80 outline-none text-base"
             />
 
             <input
               type="email"
               placeholder="Email Address"
-              className="w-full px-6 py-4 rounded-2xl border border-[#e4cab7] bg-white/70 outline-none"
+              className="w-full px-5 py-4 rounded-2xl border border-[#e4cab7] bg-white/80 outline-none text-base"
             />
 
             <select className="w-full px-6 py-4 rounded-2xl border border-[#e4cab7] bg-white/70 outline-none text-[#6a4754]">
@@ -242,7 +242,7 @@ export default function WeddingWebsite() {
             <textarea
               rows={4}
               placeholder="Message for the couple"
-              className="w-full px-6 py-4 rounded-2xl border border-[#e4cab7] bg-white/70 outline-none"
+              className="w-full px-5 py-4 rounded-2xl border border-[#e4cab7] bg-white/80 outline-none text-base"
             />
 
             <button
@@ -256,7 +256,7 @@ export default function WeddingWebsite() {
       </Section>
 
       {/* FOOTER */}
-      <footer className="py-20 px-6 text-center relative overflow-hidden">
+      <footer className="py-14 sm:py-20 px-4 sm:px-6 text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_left,_#f5b6c5,_transparent_35%),radial-gradient(circle_at_bottom_right,_#f3d7a6,_transparent_35%)]"></div>
 
         <div className="relative z-10">
