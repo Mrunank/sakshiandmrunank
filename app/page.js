@@ -121,7 +121,7 @@ export default function WeddingWebsite() {
             Welcome To
           </p>
 
-          <h1 className="text-white text-5xl sm:text-7xl md:text-8xl font-light tracking-tight mb-6">
+          <h1 className="text-[#800020] text-5xl sm:text-7xl md:text-8xl font-light tracking-tight mb-6">
             Sakshi & Mrunank
           </h1>
 
