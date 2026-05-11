@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Playfair+Display:wght@400;500&family=IM+Fell+English&family=Lato:wght@300;400&display=swap');
+body {
+  font-family: 'Lato', sans-serif;
+}
+.font-hero {
+  font-family: var(--font-cormorant), serif;
+}
+
+.font-serif-title {
+  font-family: var(--font-playfair), serif;
+}
+
+.font-ampersand {
+  font-family: var(--font-fell), serif;
+}
+html {
+  scroll-behavior: smooth;
+}
