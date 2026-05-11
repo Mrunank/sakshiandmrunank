@@ -407,12 +407,12 @@ export default function WeddingWebsite() {
       <nav className="sticky top-0 z-50 px-4 sm:px-6 pt-4">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white/55 backdrop-blur-2xl border border-[#e7d3c1] shadow-xl rounded-full px-3 sm:px-5 py-3">
-            <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
+            <div className="flex items-center justify-center gap-1 sm:gap-4 flex-nowrap overflow-x-auto">
               {NAV_LINKS.map(({ label, id }) => (
                 <a
                   key={id}
                   href={`#${id}`}
-                  className={`px-4 sm:px-5 py-2 rounded-full text-sm sm:text-base tracking-wide transition-all duration-300 ${
+                  className={`px-2 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-base tracking-wide transition-all duration-300 whitespace-nowrap ${
                     activeSection === id
                       ? "bg-[#5b2333] text-white shadow-lg"
                       : "text-[#5b2333] hover:bg-[#5b2333] hover:text-white"
@@ -461,14 +461,14 @@ export default function WeddingWebsite() {
               Join us as we celebrate the beginning of a beautiful journey filled with love, laughter, traditions, and forever.
             </p>
 
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 justify-center lg:justify-start">
+            <div className="grid grid-cols-2 gap-3 lg:flex lg:flex-row lg:flex-wrap lg:gap-4 justify-center lg:justify-start">
              {[
   { icon: "📅", label: "Engagement", value: "July 4, 2026", width: "220px" },
   { icon: "📍", label: "Engagement Location", value: "Nagpur, India", width: "260px" },
   { icon: "💍", label: "Wedding", value: "December 28, 2026", width: "220px" },
   { icon: "📍", label: "Wedding Location", value: "Indore, India", width: "260px" },
 ].map(({ icon, label, value, width }) => (
-  <div key={label} className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-[#e7d3c1] px-4 sm:px-5 py-4 rounded-2xl shadow-lg w-full" style={{ maxWidth: width }}>
+  <div key={label} className="flex items-center gap-2 sm:gap-3 bg-white/70 backdrop-blur-xl border border-[#e7d3c1] px-3 sm:px-5 py-3 sm:py-4 rounded-2xl shadow-lg w-full lg:w-auto" style={{ maxWidth: width }}>
     <span className="text-xl">{icon}</span>
     <div>
       <div className="text-sm uppercase tracking-widest text-[#9c6e5f]" style={{ fontFamily: FONT_BODY }}>{label}</div>
