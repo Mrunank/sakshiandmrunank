@@ -2,8 +2,18 @@
 
 import React, { useEffect, useState, useRef } from "react";
 
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
 const ENGAGEMENT_DATE = new Date("2026-07-04T11:00:00");
 
+// Amount to cover the decorative gold border on desktop (px)
+const DESKTOP_BORDER_COVER_SIDE = 495;   // left/right cover strip width
+const DESKTOP_BORDER_COVER_TOP = 100;    // top cover strip height
+const DESKTOP_BORDER_COVER_BOTTOM = 70; // bottom cover strip height
+
+
+// ─── HOOKS ────────────────────────────────────────────────────────────────────
+
+// Counts down to a target date, updating every second
 function useCountdown(targetDate) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -26,6 +36,10 @@ function useCountdown(targetDate) {
   return timeLeft;
 }
 
+
+// ─── SHARED COMPONENTS ────────────────────────────────────────────────────────
+
+// Single countdown unit card (Days / Hours / Minutes / Seconds)
 function CountdownCard({ label, value }) {
   return (
     <div className="bg-white/60 backdrop-blur-xl border border-[#e5cbb6] rounded-3xl px-4 sm:px-6 py-6 sm:py-8 shadow-xl min-w-[130px] text-center">
@@ -37,6 +51,7 @@ function CountdownCard({ label, value }) {
   );
 }
 
+// Reusable page section with icon, title, divider, and children
 function Section({ icon, title, children }) {
   return (
     <section className="max-w-6xl mx-auto px-6 py-20 relative z-10">
@@ -50,13 +65,19 @@ function Section({ icon, title, children }) {
   );
 }
 
-function DoorIntro({ onUnlocked }) {
-  const [progress, setProgress] = useState(0);
-  const [done, setDone] = useState(false);
-  const progressRef = useRef(0);
-  const doneRef = useRef(false);
-  const touchStartY = useRef(0);
 
+// ─── DOOR INTRO ───────────────────────────────────────────────────────────────
+
+// Full-screen animated door overlay that plays before the main page is accessible.
+// Scroll/swipe opens the doors. Once fully open, waits 1s then calls onUnlocked.
+function DoorIntro({ onUnlocked }) {
+  const [progress, setProgress] = useState(0);   // 0 = closed, 1 = fully open
+  const [done, setDone] = useState(false);        // true when doors reach 100%
+  const progressRef = useRef(0);                  // ref copy of progress for use inside event handlers
+  const doneRef = useRef(false);                  // ref copy of done for use inside event handlers
+  const touchStartY = useRef(0);                  // tracks touch start position for swipe delta
+
+  // Advances the door open progress by a delta amount
   const advance = (delta) => {
     if (doneRef.current) return;
     const next = Math.min(Math.max(progressRef.current + delta, 0), 1);
@@ -69,12 +90,14 @@ function DoorIntro({ onUnlocked }) {
     }
   };
 
+  // Attach scroll/key/touch listeners while doors are still opening.
+  // Automatically removed the moment doors finish (done = true).
   useEffect(() => {
-    if (done) return; // removes all listeners the moment doors finish
+    if (done) return;
 
     const onWheel = (e) => {
-      e.preventDefault();
-      advance(e.deltaY * 0.0015);
+      e.preventDefault(); // prevents page from scrolling behind the overlay
+      advance(e.deltaY * 0.0015); // desktop scroll sensitivity
     };
 
     const onKey = (e) => {
@@ -86,64 +109,156 @@ function DoorIntro({ onUnlocked }) {
     };
 
     const onTouchMove = (e) => {
-      e.preventDefault();
-      const delta = (touchStartY.current - e.touches[0].clientY) * 0.004;
+      e.preventDefault(); // prevents page scroll behind overlay on mobile
+      const delta = (touchStartY.current - e.touches[0].clientY) * 0.004; // mobile swipe sensitivity
       advance(delta);
       touchStartY.current = e.touches[0].clientY;
     };
 
     const onTouchEnd = () => {
-    touchStartY.current = 0;
+      touchStartY.current = 0; // reset on lift to prevent momentum leaking into page scroll
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onKey);
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd);
 
     return () => {
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
     };
   }, [done]);
 
-  // Once done, wait for the current scroll event to fully flush,
-  // then unlock after a short pause so no momentum leaks through
+  // Once doors are fully open, wait 1s for scroll momentum to fully flush,
+  // then fire onUnlocked to release the main page
   useEffect(() => {
     if (!done) return;
     const timer = setTimeout(onUnlocked, 1000);
     return () => clearTimeout(timer);
   }, [done]);
 
+  // Once done and fully open, remove the overlay entirely from the DOM
   if (done && progress >= 1) return null;
+
+  // Cover strips that hide the decorative gold border in the door images (desktop only).
+  // These are plain #F5F2E8 rectangles placed over the edges of the image.
+  const BorderCovers = ({ side }) => (
+  <>
+    {/* Outer edge vertical strip — covers the full height of the border */}
+    <div
+      className="absolute top-0 h-full hidden md:block"
+      style={{
+        [side]: 0,
+        width: DESKTOP_BORDER_COVER_SIDE,
+        backgroundColor: "#F5F2E8",
+      }}
+    />
+    {/* Top strip — covers the top corner flourish */}
+    <div
+      className="absolute hidden md:block"
+      style={{
+        [side]: 0,
+        top: 0,
+        width: "700px",
+        height: DESKTOP_BORDER_COVER_TOP,
+        backgroundColor: "#F5F2E8",
+      }}
+    />
+    {/* Bottom strip — covers the bottom corner flourish */}
+    <div
+      className="absolute hidden md:block"
+      style={{
+        [side]: 0,
+        bottom: 0,
+        width: "100%",
+        height: DESKTOP_BORDER_COVER_BOTTOM,
+        backgroundColor: "#F5F2E8",
+      }}
+    />
+  </>
+);
 
   return (
     <div className="fixed inset-0 z-[999] pointer-events-auto">
-      {/* Left door */}
+
+      {/* ── LEFT DOOR ── */}
       <div
         className="absolute left-0 top-0 h-full w-1/2 overflow-hidden"
-        style={{ transform: `translateX(-${progress * 100}%)`, willChange: "transform" }}
+        style={{
+          transform: `translateX(-${progress * 100}%)`,
+          willChange: "transform",
+          backgroundColor: "#F5F2E8", // fallback for dead space beside image on desktop
+        }}
       >
-        <img src="/door-left.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+        {/* Mobile: cover fills container */}
+        <div
+          className="absolute inset-0 block md:hidden"
+          style={{
+            backgroundImage: "url('/door-left.jpg')",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+          }}
+        />
+
+        {/* Desktop: full height, anchored to center seam */}
+        <div className="absolute hidden md:block h-full w-full">
+          <img
+            src="/door-left.jpg"
+            alt=""
+            draggable={false}
+            className="h-full w-full"
+            style={{ objectFit: "contain", objectPosition: "right center" }}
+          />
+          <BorderCovers side="left" />
+        </div>
       </div>
 
-      {/* Right door */}
+      {/* ── RIGHT DOOR ── */}
       <div
         className="absolute right-0 top-0 h-full w-1/2 overflow-hidden"
-        style={{ transform: `translateX(${progress * 100}%)`, willChange: "transform" }}
+        style={{
+          transform: `translateX(${progress * 100}%)`,
+          willChange: "transform",
+          backgroundColor: "#F5F2E8",
+        }}
       >
-        <img src="/door-right.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+        {/* Mobile: cover fills container */}
+        <div
+          className="absolute inset-0 block md:hidden"
+          style={{
+            backgroundImage: "url('/door-right.jpg')",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+          }}
+        />
+
+        {/* Desktop: full height, anchored to center seam */}
+        <div className="absolute hidden md:block h-full w-full">
+          <img
+            src="/door-right.jpg"
+            alt=""
+            draggable={false}
+            className="h-full w-full"
+            style={{ objectFit: "contain", objectPosition: "left center" }}
+          />
+          <BorderCovers side="right" />
+        </div>
       </div>
 
-      {/* Center seam */}
+      {/* ── CENTER SEAM ── fades out as doors open */}
       <div
         className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-white/20 pointer-events-none"
         style={{ opacity: 1 - progress }}
       />
 
-      {/* Text overlay */}
+      {/* ── TEXT OVERLAY ── fades out in the first half of the scroll */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
         style={{ opacity: 1 - progress * 2 }}
@@ -155,24 +270,18 @@ function DoorIntro({ onUnlocked }) {
         <p className="text-[#800020] text-sm sm:text-lg tracking-[0.3em] uppercase">Scroll To Open The Gates</p>
         <div className="mt-8 animate-bounce text-[#800020] text-3xl">↓</div>
       </div>
+
     </div>
   );
 }
 
+
+// ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 export default function WeddingWebsite() {
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(false); // false = door overlay active, true = main page scrollable
   const timeLeft = useCountdown(ENGAGEMENT_DATE);
 
-  const handleUnlocked = () => {
-    // Wait 2 frames before releasing scroll lock
-    // This lets the browser discard queued scroll momentum
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setUnlocked(true);
-      });
-    });
-  };
-
+  // Lock body scroll while door overlay is active
   useEffect(() => {
     document.body.style.overflow = unlocked ? "" : "hidden";
     return () => { document.body.style.overflow = ""; };
@@ -180,17 +289,21 @@ export default function WeddingWebsite() {
 
   return (
     <div className="bg-[#f8f2eb] text-[#4a1d2b] min-h-screen">
-      {!unlocked && <DoorIntro onUnlocked={handleUnlocked} />}
 
-      {/* Ambient blobs */}
+      {/* Door overlay — removed from DOM once unlocked */}
+      {!unlocked && <DoorIntro onUnlocked={() => setUnlocked(true)} />}
+
+      {/* Ambient background blobs for soft depth */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-[-120px] left-[-120px] w-[400px] h-[400px] rounded-full bg-pink-200 opacity-20 blur-3xl" />
         <div className="absolute bottom-[-150px] right-[-120px] w-[450px] h-[450px] rounded-full bg-yellow-100 opacity-20 blur-3xl" />
       </div>
 
-      {/* HERO */}
+      {/* ── HERO ── */}
       <section className="h-screen flex items-center justify-center px-4 sm:px-6">
         <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center py-10 sm:py-16">
+
+          {/* Left: names, dates, location */}
           <div className="text-center lg:text-left order-2 lg:order-1 px-1">
             <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/60 border border-[#e7d3c1] text-[#9c6e5f] tracking-[0.3em] uppercase text-xs mb-8 shadow-md">
               <span>✨</span> Our Forever Begins
@@ -219,6 +332,7 @@ export default function WeddingWebsite() {
             </div>
           </div>
 
+          {/* Right: wedding logo */}
           <div className="flex justify-center order-1 lg:order-2">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-pink-200 to-yellow-100 blur-3xl opacity-40 scale-110 rounded-full" />
@@ -230,7 +344,7 @@ export default function WeddingWebsite() {
         </div>
       </section>
 
-      {/* COUNTDOWN */}
+      {/* ── COUNTDOWN ── */}
       <Section icon="💖" title="Countdown">
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-4 sm:gap-5 text-center">
           <CountdownCard label="Days" value={timeLeft.days} />
@@ -240,7 +354,7 @@ export default function WeddingWebsite() {
         </div>
       </Section>
 
-      {/* OUR STORY */}
+      {/* ── OUR STORY ── */}
       <Section icon="💞" title="Our Story">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-xl md:text-2xl leading-relaxed text-[#6a4754]">
@@ -252,7 +366,7 @@ export default function WeddingWebsite() {
         </div>
       </Section>
 
-      {/* EVENT DETAILS */}
+      {/* ── EVENT DETAILS ── */}
       <Section icon="🗓️" title="Event Details">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 max-w-6xl mx-auto">
           {[
@@ -269,7 +383,7 @@ export default function WeddingWebsite() {
         </div>
       </Section>
 
-      {/* GALLERY */}
+      {/* ── GALLERY ── */}
       <Section icon="📸" title="Gallery">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 max-w-6xl mx-auto">
           {[1, 2, 3, 4].map((i) => (
@@ -280,7 +394,7 @@ export default function WeddingWebsite() {
         </div>
       </Section>
 
-      {/* RSVP */}
+      {/* ── RSVP ── */}
       <Section icon="🎶" title="RSVP">
         <div className="max-w-2xl mx-auto bg-white/65 backdrop-blur-xl border border-[#e7d3c1] rounded-[28px] sm:rounded-[40px] p-5 sm:p-10 shadow-2xl">
           <div className="space-y-6">
@@ -299,7 +413,7 @@ export default function WeddingWebsite() {
         </div>
       </Section>
 
-      {/* FOOTER */}
+      {/* ── FOOTER ── */}
       <footer className="py-14 sm:py-20 px-4 sm:px-6 text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_left,_#f5b6c5,_transparent_35%),radial-gradient(circle_at_bottom_right,_#f3d7a6,_transparent_35%)]" />
         <div className="relative z-10">
@@ -310,6 +424,7 @@ export default function WeddingWebsite() {
           </div>
         </div>
       </footer>
+
     </div>
   );
 }
