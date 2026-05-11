@@ -87,7 +87,7 @@ function DoorIntro({ onUnlocked }) {
 
     const onTouchMove = (e) => {
       e.preventDefault();
-      const delta = (touchStartY.current - e.touches[0].clientY) * 0.012;
+      const delta = (touchStartY.current - e.touches[0].clientY) * 0.004;
       advance(delta);
       touchStartY.current = e.touches[0].clientY;
     };
