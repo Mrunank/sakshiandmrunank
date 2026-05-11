@@ -583,18 +583,109 @@ export default function WeddingWebsite() {
         <Section icon="🎶" title="RSVP">
           <div className="max-w-2xl mx-auto bg-white/65 backdrop-blur-xl border border-[#e7d3c1] rounded-[28px] sm:rounded-[40px] p-5 sm:p-10 shadow-2xl">
             <div className="space-y-6" style={{ fontFamily: FONT_BODY }}>
-              <input type="text"  placeholder="Your Name"       className="w-full px-5 py-4 rounded-2xl border border-[#e4cab7] bg-white/80 outline-none text-base" />
-              <input type="email" placeholder="Email Address"   className="w-full px-5 py-4 rounded-2xl border border-[#e4cab7] bg-white/80 outline-none text-base" />
-              <select className="w-full px-6 py-4 rounded-2xl border border-[#e4cab7] bg-white/70 outline-none text-[#6a4754]">
-                <option>Will you attend?</option>
-                <option>Yes, absolutely!</option>
-                <option>Sadly, cannot make it</option>
-              </select>
-              <textarea rows={4} placeholder="Message for the couple" className="w-full px-5 py-4 rounded-2xl border border-[#e4cab7] bg-white/80 outline-none text-base" />
-              <button className="w-full bg-[#5b2333] hover:bg-[#471926] transition-colors text-white py-4 rounded-2xl tracking-[0.25em] uppercase text-sm shadow-xl">
-                Send RSVP
-              </button>
-            </div>
+  <input
+    type="text"
+    placeholder="Your Name *"
+    required
+    className="w-full px-5 py-4 rounded-2xl border border-[#e4cab7] bg-white/80 outline-none text-base"
+  />
+  <input
+    type="email"
+    placeholder="Email Address"
+    className="w-full px-5 py-4 rounded-2xl border border-[#e4cab7] bg-white/80 outline-none text-base"
+  />
+  <select
+    required
+    className="w-full px-6 py-4 rounded-2xl border border-[#e4cab7] bg-white/70 outline-none text-[#6a4754]"
+  >
+    <option value="">Will you attend? *</option>
+    <option value="yes">Yes, absolutely!</option>
+    <option value="no">Sadly, cannot make it</option>
+  </select>
+  <div className="px-1">
+    <p className="text-sm uppercase tracking-widest text-[#9c6e5f] mb-3" style={{ fontFamily: FONT_BODY }}>
+      Which events will you attend? *
+    </p>
+    <div className="space-y-3">
+      {[
+        { value: "engagement", label: "Engagement Ceremony", date: "July 4, 2026" },
+       // { value: "mehendi",    label: "Mehendi",             date: "Coming Soon"  },
+        //{ value: "haldi",      label: "Haldi",               date: "Coming Soon"  },
+        //{ value: "sangeet",    label: "Sangeet",             date: "Coming Soon"  },
+        //{ value: "wedding",    label: "Wedding Ceremony",    date: "December 28, 2026" },
+        //{ value: "reception",  label: "Reception",           date: "December 30, 2026" },
+      ].map(({ value, label, date }) => (
+        <label
+          key={value}
+          className="flex items-center gap-3 bg-white/60 border border-[#e4cab7] px-4 py-3 rounded-2xl cursor-pointer hover:bg-white/80 transition-colors"
+        >
+          <input
+            type="checkbox"
+            value={value}
+            className="accent-[#5b2333] w-4 h-4 cursor-pointer"
+          />
+          <div>
+            <span className="text-[#4a1d2b] text-sm font-medium" style={{ fontFamily: FONT_BODY }}>{label}</span>
+            <span className="text-[#9c6e5f] text-xs ml-2" style={{ fontFamily: FONT_BODY }}>— {date}</span>
+          </div>
+        </label>
+      ))}
+    </div>
+  </div>
+  <textarea
+    rows={4}
+    placeholder="Message for the couple"
+    className="w-full px-5 py-4 rounded-2xl border border-[#e4cab7] bg-white/80 outline-none text-base"
+  />
+  <button
+  onClick={async (e) => {
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg6094HHmMRNiHBs92L9MDoEghddd689ddbMq2tccSlOXQhnabw43FFr3-OVOvkfvm/exec";
+
+    const form    = e.currentTarget.closest("div");
+    const name    = form.querySelector("input[type='text']").value;
+    const email   = form.querySelector("input[type='email']").value;
+    const attend  = form.querySelector("select").value;
+    const checked = [...form.querySelectorAll("input[type='checkbox']:checked")].map(c => c.value);
+    const message = form.querySelector("textarea").value;
+
+    // Validation
+    if (!name)                { alert("Please enter your name.");           return; }
+    if (!attend)              { alert("Please select if you will attend."); return; }
+    if (checked.length === 0) { alert("Please select at least one event."); return; }
+
+    // Show loading state
+    e.currentTarget.textContent = "Sending...";
+    e.currentTarget.disabled = true;
+
+    try {
+      // Send as GET with URL params — bypasses CORS entirely
+      const params = new URLSearchParams({
+        name,
+        email,
+        attending: attend,
+        events: checked.join(", "),
+        message,
+      });
+
+      await fetch(`${SCRIPT_URL}?${params.toString()}`, {
+        method: "GET",
+        mode: "no-cors",
+      });
+
+      e.currentTarget.textContent = "RSVP Sent! 💖";
+      e.currentTarget.style.backgroundColor = "#2d6a4f";
+
+    } catch (err) {
+      alert("Something went wrong. Please try again.");
+      e.currentTarget.textContent = "Send RSVP";
+      e.currentTarget.disabled = false;
+    }
+  }}
+  className="w-full bg-[#5b2333] hover:bg-[#471926] transition-colors text-white py-4 rounded-2xl tracking-[0.25em] uppercase text-sm shadow-xl"
+>
+  Send RSVP
+</button>
+</div>
           </div>
         </Section>
       </div>
