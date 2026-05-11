@@ -2,7 +2,7 @@ import "./globals.css";
 
 export const metadata = {
   title: "Sakshi & Mrunank",
-  description: "Engagement & Wedding Website",
+  description: "Our forever begins here",
 };
 
 export default function RootLayout({ children }) {
