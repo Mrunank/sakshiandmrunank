@@ -667,18 +667,18 @@ export default function WeddingWebsite() {
         message,
       });
 
-      await fetch(`${SCRIPT_URL}?${params.toString()}`, {
-        method: "GET",
-        mode: "no-cors",
-      });
+     await fetch(`${SCRIPT_URL}?${params.toString()}`, {
+    method: "GET",
+    mode: "no-cors",
+  });
 
-      e.currentTarget.textContent = "RSVP Sent! 💖";
-      e.currentTarget.style.backgroundColor = "#2d6a4f";
+  e.currentTarget.textContent = "RSVP Sent! 💖";
+  e.currentTarget.style.backgroundColor = "#2d6a4f";
 
-    } catch (err) {
-      alert("Something went wrong. Please try again.");
-      e.currentTarget.textContent = "Send RSVP";
-      e.currentTarget.disabled = false;
+} catch (err) {
+  alert("Could not reach the server. Please check your connection and try again.");
+  e.currentTarget.textContent = "Send RSVP";
+  e.currentTarget.disabled = false;
     }
   }}
   className="w-full bg-[#5b2333] hover:bg-[#471926] transition-colors text-white py-4 rounded-2xl tracking-[0.25em] uppercase text-sm shadow-xl"
