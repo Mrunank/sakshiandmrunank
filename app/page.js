@@ -33,34 +33,129 @@ function Section({ icon, title, children }) {
 }
 
 export default function WeddingWebsite() {
-  const [doorsOpen, setDoorsOpen] = useState(false);
+  const [openProgress, setOpenProgress] = useState(0);
+  const [phase, setPhase] = useState('doors');
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
   });
+  const touchStartY = React.useRef(0);
 
-  useEffect(() => {
-  // lock scroll until doors open
-  document.body.style.overflow = 'hidden';
+  const phaseRef = React.useRef('doors');
 
-  const openDoors = () => {
-    setDoorsOpen(true);
+useEffect(() => {
+  phaseRef.current = phase;
+}, [phase]);
 
-    // unlock scroll after animation starts
+useEffect(() => {
+
+  // ✅ ADD THIS HERE (LOCK SCROLL INITIALLY)
+  document.documentElement.style.overflow = 'hidden';
+document.documentElement.style.height = '100%';
+
+document.body.style.overflow = 'hidden';
+document.body.style.height = '100%';
+
+  let progress = 0;
+
+  const update = (delta) => {
+  if (phase !== 'doors') return;
+
+  progress = Math.min(Math.max(progress + delta, 0), 1);
+  setOpenProgress(progress);
+
+  // WHEN DOORS FINISH OPENING → enter buffer phase
+  if (progress >= 1) {
+    setPhase('buffer');
+
+    // DO NOT unlock scroll yet
+    // we pause interaction for a beat
+  }
+};
+
+  const onWheel = (e) => {
+  const currentPhase = phaseRef.current;
+
+  if (currentPhase === 'doors') {
+    e.preventDefault();
+    update(e.deltaY * 0.0015);
+    return;
+  }
+
+  if (currentPhase === 'buffer') {
+    e.preventDefault();
+
+    setPhase('unlocking');
+    phaseRef.current = 'unlocking';
+    window.scrollTo(0, 0);
+
+    setTimeout(() => {
+      setPhase('unlocked');
+      phaseRef.current = 'unlocked';
+
+      document.documentElement.style.overflow = 'auto';
+      document.body.style.overflow = 'auto';
+    }, 500);
+
+    return;
+  }
+
+  // unlocked → allow natural scroll (no preventDefault)
+};
+
+  const onKeyDown = (e) => {
+  if (phase === 'doors' && e.key === 'ArrowDown') {
+    update(0.05);
+  }
+
+  if (phase === 'buffer' && e.key === 'ArrowDown') {
+    setPhase('unlocked');
     document.body.style.overflow = 'auto';
+  }
+};
 
-    window.removeEventListener('scroll', openDoors);
+const onTouchStart = (e) => {
+  touchStartY.current = e.touches[0].clientY;
+};
+
+const onTouchMove = (e) => {
+  const currentPhase = phaseRef.current;
+
+  if (currentPhase === 'unlocked') return;
+
+  e.preventDefault();
+
+  const currentY = e.touches[0].clientY;
+  const delta = (touchStartY.current - currentY) * 0.01;
+
+  update(delta);
+  touchStartY.current = currentY;
+};
+
+  const cleanup = () => {
+    window.removeEventListener('wheel', onWheel);
+    window.removeEventListener('keydown', onKeyDown);
+window.removeEventListener('touchstart', onTouchStart);
   };
 
-  window.addEventListener('scroll', openDoors);
+  window.addEventListener('wheel', onWheel, { passive: false });
+  window.addEventListener('keydown', onKeyDown);
+window.addEventListener('touchstart', onTouchStart, { passive: false });
 
   return () => {
-    window.removeEventListener('scroll', openDoors);
-    document.body.style.overflow = 'auto';
+    cleanup();
+
   };
 }, []);
+
+useEffect(() => {
+  if (phase === 'unlocked') {
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+  }
+}, [phase]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -84,60 +179,81 @@ export default function WeddingWebsite() {
   }, []);
 
   return (
-    <div className="bg-[#f8f2eb] text-[#4a1d2b] overflow-hidden">
-      {/* Cinematic Image Door Intro */}
-      <div
-        className={`fixed inset-0 z-[999] pointer-events-none transition-opacity duration-1000 ${doorsOpen ? 'opacity-0' : 'opacity-100'}`}
-      >
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black"></div>
+    <div className="bg-[#f8f2eb] text-[#4a1d2b] min-h-screen">
+{/* Cinematic Image Door Intro */}
+<div
+  className={`fixed inset-0 z-[999] pointer-events-none transition-opacity duration-700 ${
+phase === 'doors' ? 'opacity-100' : 'opacity-0'
+  }`}
+>
 
-        {/* LEFT IMAGE DOOR */}
-        <div
-          cclassName={`absolute left-0 top-0 h-full w-[50.5%] lg:w-1/2 overflow-hidden transition-transform duration-[3200ms] ease-[cubic-bezier(0.77,0,0.175,1)] transform-gpu will-change-transform ${doorsOpen ? '-translate-x-full' : 'translate-x-0'}`}
-        >
-          <img
-            src="/door-left.jpg"
-            alt="Left Door"
-            className="absolute inset-0 w-full h-full object-cover object-center scale-[1.02]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
-        </div>
+  {/* DO NOT USE FULL BLACK OVERLAY (this was your issue) */}
+  <div
+    className="absolute inset-0 transition-opacity duration-700"
+    style={{
+      opacity: phase === 'unlocked' ? 0 : 1,
+      background: 'rgba(0,0,0,0.15)', // very light cinematic tint
+    }}
+  />
 
-        {/* RIGHT IMAGE DOOR */}
-        <div
-          className={`absolute right-0 top-0 h-full w-[50.5%] lg:w-1/2 overflow-hidden transition-transform duration-[3200ms] ease-[cubic-bezier(0.77,0,0.175,1)] transform-gpu will-change-transform ${doorsOpen ? 'translate-x-full' : 'translate-x-0'}`}
-        >
-          <img
-            src="/door-right.jpg"
-            alt="Right Door"
-            className="absolute inset-0 w-full h-full object-cover object-center scale-[1.02]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-l from-black/40 to-transparent"></div>
-        </div>
+  {/* LEFT DOOR */}
+  <div
+    className="absolute left-0 top-0 h-full w-1/2 overflow-hidden transform-gpu will-change-transform"
+    style={{
+      transform: `translateX(-${openProgress * 100}%)`,
+    }}
+  >
+    <img
+      src="/door-left.jpg"
+      alt="Left Door"
+      className="absolute inset-0 w-full h-full object-cover object-center"
+      draggable={false}
+    />
+  </div>
 
-        {/* Center Glow */}
-        <div className={`absolute left-1/2 top-0 -translate-x-1/2 h-full w-[8px] bg-gradient-to-b from-[#f5d7b8] via-white to-[#f5d7b8] shadow-[0_0_40px_rgba(255,255,255,0.8)] transition-opacity duration-1000 ${doorsOpen ? 'opacity-0' : 'opacity-100'}`}></div>
+  {/* RIGHT DOOR */}
+  <div
+    className="absolute right-0 top-0 h-full w-1/2 overflow-hidden transform-gpu will-change-transform"
+    style={{
+      transform: `translateX(${openProgress * 100}%)`,
+    }}
+  >
+    <img
+      src="/door-right.jpg"
+      alt="Right Door"
+      className="absolute inset-0 w-full h-full object-cover object-center"
+      draggable={false}
+    />
+  </div>
 
-        {/* Welcome Text */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <p className="text-[#800020] uppercase tracking-[0.5em] text-xs sm:text-sm mb-4">
-            Welcome To
-          </p>
+  {/* CENTER SEAM (only visual accent, no lingering artifact) */}
+  <div
+    className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-white/20"
+    style={{
+      opacity: 1 - openProgress,
+    }}
+  />
 
-          <h1 className="text-[#800020] text-5xl sm:text-7xl md:text-8xl font-light tracking-tight mb-6">
-            Sakshi & Mrunank
-          </h1>
+  {/* TEXT OVERLAY */}
+  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+    <p className="text-[#800020] uppercase tracking-[0.5em] text-xs sm:text-sm mb-4">
+      Welcome To
+    </p>
 
-          <p className="text-[#800020] text-sm sm:text-lg tracking-[0.3em] uppercase">
-            Scroll To Open The Gates
-          </p>
+    <h1 className="text-[#800020] text-5xl sm:text-7xl md:text-8xl font-light tracking-tight mb-6">
+      Sakshi & Mrunank
+    </h1>
 
-          <div className="mt-8 animate-bounce text-white text-3xl">
-            ↓
-          </div>
-        </div>
-      </div>
+    <p className="text-[#800020] text-sm sm:text-lg tracking-[0.3em] uppercase">
+      Scroll To Open The Gates
+    </p>
+
+    <div className="mt-8 animate-bounce text-white text-3xl">
+      ↓
+    </div>
+  </div>
+
+</div>
 
       {/* Background Effects */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
@@ -146,7 +262,7 @@ export default function WeddingWebsite() {
       </div>
 
       {/* HERO */}
-      <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 relative overflow-hidden">
+      <section className="h-screen flex items-center justify-center px-4 sm:px-6 relative">
         <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center py-10 sm:py-16">
           {/* Left Content */}
           <div className="text-center lg:text-left order-2 lg:order-1 px-1">
